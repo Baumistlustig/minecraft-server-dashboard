@@ -1,15 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { SimpleNgWebSocket } from "simple-ng-websocket";
+
+export interface Message {
+  author: string;
+  message: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class RconService {
+  constructor(private readonly ngws: SimpleNgWebSocket) {
+    this.ngws.on('message', (msg) => {
+      console.log('message received: ' + msg);
+    });
+  }
 
-  constructor(private readonly http: HttpClient) {  }
-
-  public sendCommand(command: string): Observable<any> {
-    return this.http.get(`http://localhost:3000/${command}`, { responseType: 'text' });
+  sendMessage(msg: string): void {
+    this.ngws.send(msg);
   }
 }
